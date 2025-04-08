@@ -11,3 +11,6 @@ Chrome拡張機能のインストール方法は以下。
 ストアへの登録はしていないので、デベロッパーモードでインストールする必要があります。    
 [https://support.google.com/chrome/a/answer/2714278?hl=ja](https://support.google.com/chrome/a/answer/2714278?hl=ja)
 
+## 注意
+Googleの検索画面とかでもデッドリンクチェック走るので、たまにBOTチェックが入ることがあるようです。  
+不要な時は無効化しておいたほうが良いかも。  
