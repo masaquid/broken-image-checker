@@ -7,5 +7,7 @@ DOM構築後にimgタグのsrc/srcsetのURLにリクエストを送って、正�
 ピン留めをクリックすると、リンク切れURLのコピーが出来ます。  
 Spreadsheetとかにコピペして目視確認するのに役立ててください。
 
-Chrome拡張機能のインストール方法は以下  
-[https://support.google.com/chrome_webstore/answer/2664769?hl=ja](https://support.google.com/chrome_webstore/answer/2664769?hl=ja)
+Chrome拡張機能のインストール方法は以下。
+ストアへの登録はしていないので、デベロッパーモードでインストールする必要があります。    
+[https://support.google.com/chrome/a/answer/2714278?hl=ja](https://support.google.com/chrome/a/answer/2714278?hl=ja)
+
