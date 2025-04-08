@@ -1,27 +1,24 @@
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender) => {
   if (message.type === "updateBadge") {
-    const tabId = sender.tab.id;
-    const count = message.count;
-    const detail = message.detail || [];
+    const tabId = sender.tab?.id;
+    if (!tabId) return;
 
     chrome.action.setBadgeText({
       tabId: tabId,
-      text: count.toString()
+      text: message.count.toString()
     });
 
     chrome.action.setBadgeBackgroundColor({
       tabId: tabId,
-      color: count > 0 ? '#d93025' : '#34a853'
+      color: message.count > 0 ? '#d93025' : '#34a853'
     });
 
-    // setTitle に詳細な一覧をセット
-    const tooltipText = detail.length === 0
-      ? "No broken images detected."
-      : detail.slice(0, 10).map(i => `${i.url} (${i.reason})`).join('\n') + (detail.length > 10 ? '\n...more' : '');
+    const tooltip = message.detail.slice(0, 10).map(i => `${i.url} (${i.reason})`).join('\n')
+      + (message.detail.length > 10 ? '\n...more' : '');
 
     chrome.action.setTitle({
       tabId: tabId,
-      title: tooltipText
+      title: tooltip || 'No broken images detected.'
     });
   }
 });

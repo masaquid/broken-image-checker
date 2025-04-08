@@ -1,5 +1,4 @@
-// 🔧 タブ内で画像リンク切れをチェックする関数（トップレベルで定義）
-async function checkDeadImages() {
+(async function () {
   const imgs = Array.from(document.images);
   const brokenInfo = [];
 
@@ -32,53 +31,10 @@ async function checkDeadImages() {
     }
   }
 
-  return uniqueInfo;
-}
-
-// ✅ ポップアップが読み込まれたときの処理
-document.addEventListener('DOMContentLoaded', async () => {
-  const list = document.getElementById('deadLinks');
-  const copyBtn = document.getElementById('copyBtn');
-
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-    chrome.scripting.executeScript(
-      {
-        target: { tabId: tab.id },
-        function: checkDeadImages,
-      },
-      (results) => {
-        if (!results || !results[0] || !results[0].result) {
-          const li = document.createElement('li');
-          li.textContent = 'Failed to check images.';
-          list.appendChild(li);
-          return;
-        }
-
-        const detail = results[0].result;
-
-        if (detail.length === 0) {
-          const li = document.createElement('li');
-          li.textContent = 'No broken images found.';
-          list.appendChild(li);
-        } else {
-          detail.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = `${item.url} (${item.reason})`;
-            list.appendChild(li);
-          });
-
-          copyBtn.addEventListener('click', () => {
-            const allUrls = detail.map(i => i.url).join('\n'); // ← URLのみ
-            navigator.clipboard.writeText(allUrls);
-          });
-        }
-      }
-    );
-  } catch (err) {
-    const li = document.createElement('li');
-    li.textContent = 'Error: ' + err.message;
-    list.appendChild(li);
-  }
-});
+  // ✅ バッジ更新メッセージ送信
+  chrome.runtime.sendMessage({
+    type: "updateBadge",
+    count: uniqueInfo.length,
+    detail: uniqueInfo
+  });
+})();

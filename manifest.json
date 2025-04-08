@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "broken-image-checker",
-  "version": "0.1",
+  "version": "0.2",
   "author": "masaquid",
   "description": "Automatically detects broken image links and shows count in badge.",
   "permissions": [
@@ -19,7 +19,8 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": { 
+    "default_icon": {
+      "16": "icon16.png",
       "48": "icon48.png",
       "128": "icon128.png"
     }

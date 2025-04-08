@@ -1,32 +1,3 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    function: checkDeadImages
-  }, (results) => {
-    const detail = results[0].result || [];
-    const list = document.getElementById('deadLinks');
-
-    if (detail.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = 'No broken images found.';
-      list.appendChild(li);
-    } else {
-      detail.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = `${item.url} (${item.reason})`;
-        list.appendChild(li);
-      });
-
-      document.getElementById('copyBtn').addEventListener('click', () => {
-        const allUrls = detail.map(i => i.url).join('\n'); // ← URLのみ
-        navigator.clipboard.writeText(allUrls);
-      });
-    }
-  });
-});
-
 async function checkDeadImages() {
   const imgs = Array.from(document.images);
   const brokenInfo = [];
@@ -62,3 +33,57 @@ async function checkDeadImages() {
 
   return uniqueInfo;
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const list = document.getElementById('deadLinks');
+  const copyBtn = document.getElementById('copyBtn');
+
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tab.id },
+        function: checkDeadImages,
+      },
+      (results) => {
+        if (!results || !results[0] || !results[0].result) {
+          const li = document.createElement('li');
+          li.textContent = 'Failed to check images.';
+          list.appendChild(li);
+          return;
+        }
+
+        const detail = results[0].result;
+
+        chrome.runtime.sendMessage({
+          type: "updateBadge",
+          tabId: tab.id,
+          count: detail.length,
+          detail: detail
+        });
+
+        if (detail.length === 0) {
+          const li = document.createElement('li');
+          li.textContent = 'No broken images found.';
+          list.appendChild(li);
+        } else {
+          detail.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.url} (${item.reason})`;
+            list.appendChild(li);
+          });
+
+          copyBtn.addEventListener('click', () => {
+            const allUrls = detail.map(i => i.url).join('\n');
+            navigator.clipboard.writeText(allUrls);
+          });
+        }
+      }
+    );
+  } catch (err) {
+    const li = document.createElement('li');
+    li.textContent = 'Error: ' + err.message;
+    list.appendChild(li);
+  }
+});
